@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block title %}Visitors List - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark mb-0">Visitors List</h2>
+    {% if request.user.role == 'Admin' or request.user.role == 'Warden' %}
+    <a href="{% url 'add_visitor' %}" class="btn btn-primary shadow-sm">
+        <i class="bi bi-person-plus me-1"></i> Add Visitor
+    </a>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Visitor Name</th>
+                        <th>Student Visited</th>
+                        <th>Room</th>
+                        <th>Visit Date</th>
+                        <th>Visit Time</th>
+                        <th>Reason</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for visitor in visitors %}
+                    <tr>
+                        <td class="ps-4 fw-medium">
+                            <div class="rounded-circle bg-light d-inline-flex align-items-center justify-content-center
+                                       text-secondary me-2" style="width: 36px; height: 36px;">
+                                <i class="bi bi-person-fill"></i>
+                            </div>
+                            {{ visitor.visitor_name }}
+                        </td>
+                        <td>{{ visitor.student.name }}</td>
+                        <td>{{ visitor.student.room|default:'-' }}</td>
+                        <td>{{ visitor.visit_date|date:"M d, Y" }}</td>
+                        <td>{{ visitor.visit_time|time:"H:i" }}</td>
+                        <td>{{ visitor.visit_reason }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No visitors found in the system.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

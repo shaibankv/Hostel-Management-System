@@ -1,0 +1,246 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Users - SEA HSM{% endblock %}
+
+{% block extra_css %}
+<style>
+    .nav-pills .nav-link {
+        color: #495057;
+        font-weight: 500;
+        border-radius: 6px;
+        padding: 8px 16px;
+        transition: all 0.2s;
+    }
+    .nav-pills .nav-link:hover {
+        background-color: #e9ecef;
+    }
+    .nav-pills .nav-link.active {
+        background-color: #0d6efd;
+        box-shadow: 0 4px 6px rgba(13, 110, 253, 0.2);
+    }
+    .badge {
+        font-weight: 600;
+        font-size: 0.85em;
+        padding: 5px 10px;
+        border-radius: 4px;
+    }
+    .modal-content {
+        border-radius: 12px;
+    }
+    .table-hover tbody tr:hover {
+        background-color: rgba(13, 110, 253, 0.03);
+    }
+    .btn-toggle-password i {
+        pointer-events: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2 class="fw-bold text-dark mb-1">Manage System Users</h2>
+        <p class="text-muted mb-0">List, filter, update details, view credentials, and delete user accounts.</p>
+    </div>
+    <a href="{% url 'add_user' %}" class="btn btn-primary shadow-sm px-3 py-2">
+        <i class="bi bi-person-plus-fill me-1"></i> Add New User
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3 mb-5">
+    <div class="card-header bg-white border-bottom-0 pt-4 pb-2">
+        <div class="row align-items-center g-3">
+            <div class="col-lg-4 col-md-5">
+                <div class="input-group shadow-sm rounded-3">
+                    <span class="input-group-text bg-white border-end-0"><i class="bi bi-search text-muted"></i></span>
+                    <input type="text" id="searchInput" class="form-control border-start-0 ps-0" placeholder="Search users by name, email, role...">
+                </div>
+            </div>
+            <div class="col-lg-8 col-md-7">
+                <!-- Nav Tabs for Filtering -->
+                <ul class="nav nav-pills justify-content-md-end gap-1" id="userTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="all-tab" data-bs-toggle="pill" data-bs-target="#all-users" type="button" role="tab" aria-controls="all-users" aria-selected="true">
+                            All Users <span class="badge bg-light text-dark border ms-1">{{ users.count }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="admins-tab" data-bs-toggle="pill" data-bs-target="#admins" type="button" role="tab" aria-controls="admins" aria-selected="false">
+                            Admins <span class="badge bg-light text-dark border ms-1">{{ admins.count }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="wardens-tab" data-bs-toggle="pill" data-bs-target="#wardens" type="button" role="tab" aria-controls="wardens" aria-selected="false">
+                            Wardens <span class="badge bg-light text-dark border ms-1">{{ wardens.count }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="staff-tab" data-bs-toggle="pill" data-bs-target="#staff" type="button" role="tab" aria-controls="staff" aria-selected="false">
+                            Staff <span class="badge bg-light text-dark border ms-1">{{ staff.count }}</span>
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="students-tab" data-bs-toggle="pill" data-bs-target="#students" type="button" role="tab" aria-controls="students" aria-selected="false">
+                            Students <span class="badge bg-light text-dark border ms-1">{{ students.count }}</span>
+                        </button>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="card-body p-0 mt-3 border-top">
+        <div class="tab-content" id="userTabsContent">
+            <!-- All Users Tab -->
+            <div class="tab-pane fade show active" id="all-users" role="tabpanel" aria-labelledby="all-tab">
+                {% include 'manage_users_table.html' with user_list=users table_id="allUsersTable" %}
+            </div>
+            <!-- Admins Tab -->
+            <div class="tab-pane fade" id="admins" role="tabpanel" aria-labelledby="admins-tab">
+                {% include 'manage_users_table.html' with user_list=admins table_id="adminsTable" %}
+            </div>
+            <!-- Wardens Tab -->
+            <div class="tab-pane fade" id="wardens" role="tabpanel" aria-labelledby="wardens-tab">
+                {% include 'manage_users_table.html' with user_list=wardens table_id="wardensTable" %}
+            </div>
+            <!-- Staff Tab -->
+            <div class="tab-pane fade" id="staff" role="tabpanel" aria-labelledby="staff-tab">
+                {% include 'manage_users_table.html' with user_list=staff table_id="staffTable" %}
+            </div>
+            <!-- Students Tab -->
+            <div class="tab-pane fade" id="students" role="tabpanel" aria-labelledby="students-tab">
+                {% include 'manage_users_table.html' with user_list=students table_id="studentsTable" %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Edit User Modal -->
+<div class="modal fade" id="editUserModal" tabindex="-1" aria-labelledby="editUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <form id="editUserForm" method="post" action="">
+                {% csrf_token %}
+                <div class="modal-header bg-primary text-white">
+                    <h5 class="modal-title fw-bold" id="editUserModalLabel"><i class="bi bi-pencil-square me-2"></i>Edit User Account</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label for="edit_username" class="form-label fw-semibold">Username <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control shadow-sm" id="edit_username" name="username" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_email" class="form-label fw-semibold">Email Address <span class="text-danger">*</span></label>
+                        <input type="email" class="form-control shadow-sm" id="edit_email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_role" class="form-label fw-semibold">Role <span class="text-danger">*</span></label>
+                        <select class="form-select shadow-sm" id="edit_role" name="role" required>
+                            <option value="Admin">Admin</option>
+                            <option value="Warden">Warden</option>
+                            <option value="Staff">Staff</option>
+                            <option value="Student">Student</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="edit_password" class="form-label fw-semibold">New Password</label>
+                        <input type="password" class="form-control shadow-sm" id="edit_password" name="password" placeholder="Leave blank to keep unchanged">
+                        <div class="form-text text-muted mt-1">If changed, this updates the user's login password and enables you to view it in plaintext here.</div>
+                    </div>
+                </div>
+                <div class="modal-footer bg-light border-top-0">
+                    <button type="button" class="btn btn-secondary shadow-sm" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary shadow-sm">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" aria-labelledby="deleteUserModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title fw-bold" id="deleteUserModalLabel"><i class="bi bi-exclamation-triangle-fill me-2"></i>Delete User Account</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-center">
+                <i class="bi bi-x-circle text-danger display-4 mb-3 d-inline-block"></i>
+                <h4 class="fw-bold mb-2">Are you sure?</h4>
+                <p class="text-muted mb-0">Do you really want to delete user <strong id="delete_username_display"></strong>? This action cannot be undone and will automatically delete any associated Student or Employee records.</p>
+            </div>
+            <div class="modal-footer bg-light border-top-0 justify-content-center">
+                <button type="button" class="btn btn-secondary px-4 shadow-sm" data-bs-dismiss="modal">Cancel</button>
+                <a id="deleteUserBtn" href="" class="btn btn-danger px-4 shadow-sm">Delete User</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Search Functionality across all tables
+    document.getElementById('searchInput').addEventListener('keyup', function() {
+        let filter = this.value.toLowerCase();
+        let rows = document.querySelectorAll('table tbody tr');
+        
+        rows.forEach(row => {
+            let text = row.innerText.toLowerCase();
+            row.style.display = text.includes(filter) ? '' : 'none';
+        });
+    });
+
+    // View Password eye toggle
+    document.addEventListener('click', function(event) {
+        if (event.target.classList.contains('btn-toggle-password') || event.target.closest('.btn-toggle-password')) {
+            const button = event.target.classList.contains('btn-toggle-password') ? event.target : event.target.closest('.btn-toggle-password');
+            const passwordSpan = button.closest('div').querySelector('.password-text');
+            const icon = button.querySelector('i');
+            
+            if (passwordSpan.getAttribute('data-hidden') === 'true') {
+                passwordSpan.textContent = passwordSpan.getAttribute('data-password');
+                passwordSpan.setAttribute('data-hidden', 'false');
+                icon.classList.remove('bi-eye');
+                icon.classList.add('bi-eye-slash');
+            } else {
+                passwordSpan.textContent = '••••••••';
+                passwordSpan.setAttribute('data-hidden', 'true');
+                icon.classList.remove('bi-eye-slash');
+                icon.classList.add('bi-eye');
+            }
+        }
+    });
+
+    // Populate Edit User Modal
+    const editUserModal = document.getElementById('editUserModal');
+    editUserModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const username = button.getAttribute('data-username');
+        const email = button.getAttribute('data-email');
+        const role = button.getAttribute('data-role');
+        
+        const form = document.getElementById('editUserForm');
+        form.action = `/manage_users/edit/${userId}/`;
+        
+        document.getElementById('edit_username').value = username;
+        document.getElementById('edit_email').value = email;
+        document.getElementById('edit_role').value = role;
+        document.getElementById('edit_password').value = '';
+    });
+
+    // Populate Delete Modal
+    const deleteUserModal = document.getElementById('deleteUserModal');
+    deleteUserModal.addEventListener('show.bs.modal', function(event) {
+        const button = event.relatedTarget;
+        const userId = button.getAttribute('data-user-id');
+        const username = button.getAttribute('data-username');
+        
+        document.getElementById('delete_username_display').textContent = username;
+        document.getElementById('deleteUserBtn').href = `/manage_users/delete/${userId}/`;
+    });
+</script>
+{% endblock %}

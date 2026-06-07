@@ -1,0 +1,183 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>File a Complaint | Hostel Management System</title>
+    <link rel="icon" type="image/png" href="{% static 'accounts/logo.png' %}">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f6f9;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .navbar-custom {
+            background-color: #fff;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
+        }
+
+        .complaint-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            background: #fff;
+            overflow: hidden;
+        }
+
+        .complaint-header {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+            padding: 25px 30px;
+            border-bottom: none;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: #e74c3c;
+            box-shadow: 0 0 0 0.25rem rgba(231, 76, 60, 0.25);
+        }
+
+        .btn-submit {
+            background-color: #e74c3c;
+            border-color: #e74c3c;
+            color: white;
+            padding: 10px 24px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #c0392b;
+            border-color: #c0392b;
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Top Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light navbar-custom py-3">
+        <div class="container">
+            <a class="navbar-brand fw-bold d-flex align-items-center" href="{% url 'dashboard' %}">
+                <i class="bi bi-building me-2 text-danger"></i> SEA HSM
+            </a>
+            <div class="d-flex align-items-center">
+                <a href="{% url 'dashboard' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+                    <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <div class="container flex-grow-1 d-flex align-items-center justify-content-center py-5">
+        <div class="row w-100 justify-content-center">
+            <div class="col-12 col-lg-8 col-xl-7">
+                
+                <div class="card complaint-card">
+                    <div class="card-header complaint-header">
+                        <div class="d-flex align-items-center">
+                            <div class="bg-white text-danger rounded-circle p-3 d-flex align-items-center justify-content-center me-3" style="width: 48px; height: 48px;">
+                                <i class="bi bi-exclamation-triangle-fill fs-4"></i>
+                            </div>
+                            <div>
+                                <h3 class="fw-bold mb-1">File a Complaint</h3>
+                                <p class="mb-0 opacity-75 small">Having an issue? Let us know so we can fix it.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-body p-4 p-md-5">
+                        <form method="POST" action="{% url 'add_complaint' %}">
+                            {% csrf_token %}
+                            
+                            <h5 class="fw-bold mb-4 text-muted border-bottom pb-2">Student & Location Details</h5>
+                            
+                            <div class="row g-3 mb-4">
+                                <div class="col-12">
+                                    <label for="name" class="form-label fw-medium">Full Name</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-person text-muted"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="name" name="name" 
+                                            value="{{ request.user.student.name|default:request.user.username }}" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="block" class="form-label fw-medium">Hostel Block</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-building text-muted"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="block" name="block" 
+                                            value="{{ request.user.student.room.block|default:'' }}" placeholder="e.g., Block A" required>
+                                    </div>
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    <label for="room_no" class="form-label fw-medium">Room Number</label>
+                                    <div class="input-group">
+                                        <span class="input-group-text bg-light border-end-0"><i class="bi bi-door-closed text-muted"></i></span>
+                                        <input type="text" class="form-control border-start-0 ps-0" id="room_no" name="room_no" 
+                                            value="{{ request.user.student.room.room_no|default:'' }}" placeholder="e.g., 101" required>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="col-md-6">
+                                    <label for="date" class="form-label fw-medium">Date of Complaint</label>
+                                    <input type="date" class="form-control" id="date" name="date" value="{{ today }}" placeholder="YYYY-MM-DD" required>
+                                </div> -->
+                            </div>
+                            
+                            <h5 class="fw-bold mb-4 text-muted border-bottom pb-2 mt-2">Issue Details</h5>
+                            
+                            <div class="mb-3">
+                                <label for="complaint" class="form-label fw-medium">Complaint Subject / Category</label>
+                                <div class="input-group">
+                                    <span class="input-group-text bg-light border-end-0"><i class="bi bi-tag text-muted"></i></span>
+                                    <input type="text" class="form-control border-start-0 ps-0" id="complaint" name="complaint" 
+                                        placeholder="e.g., Broken Window, Electrical Issue" maxlength="40" required>
+                                </div>
+                                <div class="form-text">Briefly describe the category or subject of the issue (Max 40 chars).</div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="description" class="form-label fw-medium">Detailed Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="5" 
+                                    placeholder="Please provide specific details about the issue so our staff can assist you better..." required></textarea>
+                            </div>
+                            
+                            <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-5">
+                                <a href="{% url 'dashboard' %}" class="btn btn-light px-4">Cancel</a>
+                                <button type="submit" class="btn btn-submit rounded px-4 d-flex align-items-center justify-content-center">
+                                    <i class="bi bi-send me-2"></i> Submit Complaint
+                                </button>
+                            </div>
+                            
+                        </form>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="py-4 bg-white mt-auto border-top">
+        <div class="container text-center text-muted">
+            <small>&copy; 2026 Hostel Management System. All rights reserved.</small>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+<div class="table-responsive">
+    <table class="table table-hover align-middle mb-0" id="{{ table_id }}">
+        <thead class="table-light">
+            <tr>
+                <th class="ps-4">Username</th>
+                <th>Email</th>
+                <th>Role</th>
+                <th class="pe-4 text-end">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in user_list %}
+            <tr>
+                <td class="ps-4 fw-semibold text-dark">
+                    {{ user.username }}
+                    {% if user.id == request.user.id %}
+                    <span class="badge bg-info text-dark ms-2">You</span>
+                    {% endif %}
+                </td>
+                <td>{{ user.email }}</td>
+                <td>
+                    <span class="badge 
+                        {% if user.role == 'Admin' %}bg-danger
+                        {% elif user.role == 'Warden' %}bg-warning text-dark
+                        {% elif user.role == 'Staff' %}bg-primary
+                        {% elif user.role == 'Student' %}bg-success
+                        {% else %}bg-secondary{% endif %}">
+                        {{ user.role }}
+                    </span>
+                </td>
+                <td class="pe-4 text-end">
+                    <button type="button" class="btn btn-sm btn-outline-secondary me-1 shadow-sm" 
+                            data-bs-toggle="modal" data-bs-target="#editUserModal"
+                            data-user-id="{{ user.id }}"
+                            data-username="{{ user.username }}"
+                            data-email="{{ user.email }}"
+                            data-role="{{ user.role }}">
+                        <i class="bi bi-pencil"></i>
+                    </button>
+                    
+                    {% if user.id != request.user.id %}
+                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm" 
+                            data-bs-toggle="modal" data-bs-target="#deleteUserModal"
+                            data-user-id="{{ user.id }}"
+                            data-username="{{ user.username }}">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    {% else %}
+                    <button type="button" class="btn btn-sm btn-outline-danger shadow-sm disabled" disabled title="You cannot delete yourself">
+                        <i class="bi bi-trash"></i>
+                    </button>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="5" class="text-center text-muted py-4">No users found under this category.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>

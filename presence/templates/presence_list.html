@@ -1,0 +1,63 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Log - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark mb-0">Student Attendance / In-Out Log</h2>
+    <a href="{% url 'add_presence' %}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-1"></i> Add Record
+    </a>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Student Name</th>
+                        <th>Reg Number</th>
+                        <th>Date Out</th>
+                        <th>Time Out</th>
+                        <th>Status</th>
+                        <th>Date In</th>
+                        <th>Reason</th>
+                        <th class="pe-4 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in records %}
+                    <tr>
+                        <td class="ps-4 fw-medium">{{ record.student.name }}</td>
+                        <td>{{ record.student.reg_number }}</td>
+                        <td>{{ record.date_out|date:"M d, Y" }}</td>
+                        <td>{{ record.time_out|time:"H:i A" }}</td>
+                        <td>
+                            {% if record.status == 'Inside' %}
+                            <span class="badge bg-success text-white">Inside</span>
+                            {% else %}
+                            <span class="badge bg-warning text-dark">Outside</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ record.date_in|date:"M d, Y"|default:"-" }}</td>
+                        <td>{{ record.reason }}</td>
+                        <td class="pe-4 text-end">
+                            {% if record.status == 'Outside' %}
+                            <a href="{% url 'mark_in' record.id %}" class="btn btn-sm btn-outline-success">Mark In</a>
+                            {% else %}
+                            <span class="text-muted"><i class="bi bi-check-circle"></i> Completed</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">No attendance records found.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

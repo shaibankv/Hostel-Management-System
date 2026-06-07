@@ -1,0 +1,163 @@
+{% extends 'base.html' %}
+
+{% block title %}Student Details - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-dark mb-0 d-print-none">Student Profile</h2>
+            <div class="d-print-none">
+                {% if request.user.role == 'Admin' %}
+                <a href="{% url 'student_list' %}" class="btn btn-outline-secondary me-2">
+                    <i class="bi bi-arrow-left me-1"></i> Back to List
+                </a>
+                {% endif %}
+                {% if request.user.role == 'Admin' %}
+                <a href="{% url 'edit_student' student.id %}" class="btn btn-primary shadow-sm">
+                    <i class="bi bi-pencil me-1"></i> Edit Student
+                </a>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-3 mb-4">
+            <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                <h5 class="fw-bold mb-0 text-primary border-bottom pb-2">Personal Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row g-4">
+                    <div class="col-md-4 text-center">
+                        {% if student.photo %}
+                        <img src="{{ student.photo.url }}" alt="Profile Photo"
+                            class="img-fluid rounded-circle shadow-sm mb-3"
+                            style="width: 150px; height: 150px; object-fit: cover;">
+                        {% else %}
+                        <div class="bg-light rounded-circle d-flex align-items-center justify-content-center shadow-sm mx-auto mb-3"
+                            style="width: 150px; height: 150px;">
+                            <i class="bi bi-person text-secondary" style="font-size: 4rem;"></i>
+                        </div>
+                        {% endif %}
+                        <h5 class="fw-bold mb-1">{{ student.name }}</h5>
+                        <p class="text-muted mb-0">{{ student.reg_number }}</p>
+                    </div>
+                    <div class="col-md-8">
+                        <div class="row g-3">
+                            <div class="col-sm-6">
+                                <label class="text-muted small fw-bold text-uppercase">Date of Birth</label>
+                                <p class="fw-medium mb-0">{{ student.dob }}</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small fw-bold text-uppercase">Phone Number</label>
+                                <p class="fw-medium mb-0">{{ student.phone }}</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small fw-bold text-uppercase">Email Address</label>
+                                <p class="fw-medium mb-0">{{ student.email }}</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small fw-bold text-uppercase">Home Address</label>
+                                <p class="fw-medium mb-0">{{ student.home_address }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                        <h5 class="fw-bold mb-0 text-primary border-bottom pb-2">Academic & Hostel Details</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="text-muted small fw-bold text-uppercase">Course & Year</label>
+                                <p class="fw-medium mb-0">{{ student.course }} (Year {{ student.year }})</p>
+                            </div>
+                            <div class="col-12">
+                                <label class="text-muted small fw-bold text-uppercase">Room Assignment</label>
+                                <p class="fw-medium mb-0">
+                                    {% if student.room %}
+                                    <span class="badge bg-info text-dark fs-6">{{ student.room }}</span>
+                                    {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-12">
+                                <label class="text-muted small fw-bold text-uppercase">Hostel Fee</label>
+                                <p class="fw-medium mb-0">
+                                    {% if student.hostel_fee %}
+                                    <span class="text-dark"><strong>₹{{ student.hostel_fee }}</strong></span>
+                                    {% else %}
+                                    <span class="text-muted">Unassigned</span>
+                                    {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card border-0 shadow-sm rounded-3 h-100">
+                    <div class="card-header bg-white border-bottom-0 pt-4 pb-0">
+                        <h5 class="fw-bold mb-0 text-primary border-bottom pb-2">Guardian Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-12">
+                                <label class="text-muted small fw-bold text-uppercase">Guardian Name</label>
+                                <p class="fw-medium mb-0">{{ student.guardian_name }}</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small fw-bold text-uppercase">Guardian Phone</label>
+                                <p class="fw-medium mb-0">{{ student.guardian_phone }}</p>
+                            </div>
+                            <div class="col-sm-6">
+                                <label class="text-muted small fw-bold text-uppercase">Guardian Email</label>
+                                <p class="fw-medium mb-0">{{ student.guardian_email }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-3 mt-4 d-print-none">
+            <div class="card-body p-4 text-center">
+                <h5 class="fw-bold mb-3">Documents</h5>
+                <div class="d-flex justify-content-center gap-3">
+                    {% if student.photo %}
+                    <a href="{{ student.photo.url }}" target="_blank" class="btn btn-outline-primary shadow-sm">
+                        <i class="bi bi-person-bounding-box me-2"></i>View Photo
+                    </a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary" disabled><i class="bi bi-person-bounding-box me-2"></i>No
+                        Photo Uploaded</button>
+                    {% endif %}
+
+                    {% if student.id_proof %}
+                    <a href="{{ student.id_proof.url }}" target="_blank" class="btn btn-outline-primary shadow-sm">
+                        <i class="bi bi-card-heading me-2"></i>View ID Proof
+                    </a>
+                    {% else %}
+                    <button class="btn btn-outline-secondary" disabled><i class="bi bi-card-heading me-2"></i>No ID
+                        Proof</button>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="d-flex justify-content-center mb-3">
+                <button onclick="window.print()" class="btn btn-outline-success me-2 shadow-sm">
+                    <i class="bi bi-printer me-1"></i> Print
+                </button>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

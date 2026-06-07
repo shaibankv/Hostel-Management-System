@@ -1,0 +1,131 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Employee - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-dark mb-0">Add New Employee</h2>
+            <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancel
+            </a>
+        </div>
+
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <form action="{% url 'add_employee' %}" method="post">
+                    {% csrf_token %}
+                    
+                    <!-- Account Linking -->
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Account & Identity</h5>
+                    <div class="row g-3 mb-5">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="user" class="form-label fw-medium mb-0">Link User Account <span class="text-muted small">(optional)</span></label>
+                                <a href="{% url 'add_user' %}" class="btn btn-sm btn-outline-primary shadow-sm" style="padding: 0.1rem 0.5rem; font-size: 0.8rem;">
+                                    <i class="bi bi-person-plus"></i> Create User
+                                </a>
+                            </div>
+                            <select class="form-select" id="user" name="user">
+                                <option value="">-- No user account (employee only) --</option>
+                                {% for u in users %}
+                                <option value="{{ u.id }}">{{ u.username }} — {{ u.get_role_display|default:u.role }} ({{ u.email }})</option>
+                                {% endfor %}
+                            </select>
+                            <div class="form-text">Link a system user account so this employee can log in. Only Warden and Staff accounts are shown.</div>
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Employee Details</h5>
+                    
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label fw-medium">Full Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required placeholder="e.g., John Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="role" class="form-label fw-medium">Role <span class="text-danger">*</span></label>
+                            <select class="form-select" id="role" name="role" required>
+                                <option value="" selected disabled>Select a role...</option>
+                                <option value="Warden">Warden</option>
+                                <option value="Staff">Staff</option>
+                                <option value="Cleaning">Cleaning</option>
+                                <option value="Security">Security</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6" id="blockGroup" style="display: none;">
+                            <label for="block" class="form-label fw-medium">Assigned Block <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="block" name="block" placeholder="e.g., A, B, C">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Contact Information</h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label fw-medium">Phone Number <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="phone" name="phone" required placeholder="+91 1234567890">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label fw-medium">Email Address <span class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="john@example.com">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Employment Information</h5>
+
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="salary" class="form-label fw-medium">Salary (Monthly) <span class="text-danger">*</span></label>
+                            <div class="input-group">
+                                <span class="input-group-text">₹</span>
+                                <input type="number" step="0.01" class="form-control" id="salary" name="salary" required placeholder="0.00">
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="shift" class="form-label fw-medium">Work Shift <span class="text-danger">*</span></label>
+                            <select class="form-select" id="shift" name="shift" required>
+                                <option value="" selected disabled>Select a shift...</option>
+                                <option value="Morning">Morning (06:00 - 14:00)</option>
+                                <option value="Evening">Evening (14:00 - 22:00)</option>
+                                <option value="Night">Night (22:00 - 06:00)</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-save me-2"></i> Save Employee Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const roleSelect = document.getElementById('role');
+        const blockGroup = document.getElementById('blockGroup');
+        const blockInput = document.getElementById('block');
+
+        function toggleBlockField() {
+            if (roleSelect.value === 'Warden') {
+                blockGroup.style.display = 'block';
+                blockInput.setAttribute('required', 'required');
+            } else {
+                blockGroup.style.display = 'none';
+                blockInput.removeAttribute('required');
+                blockInput.value = '';
+            }
+        }
+
+        roleSelect.addEventListener('change', toggleBlockField);
+        toggleBlockField();
+    });
+</script>
+{% endblock %}

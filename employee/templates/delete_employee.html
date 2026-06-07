@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block title %}Delete Employee - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-6 col-lg-5">
+        <div class="card border-danger shadow-sm rounded-3">
+            <div class="card-header bg-danger text-white py-3 text-center rounded-top-3">
+                <i class="bi bi-exclamation-triangle-fill fs-1 d-block mb-2"></i>
+                <h4 class="mb-0 fw-bold">Confirm Deletion</h4>
+            </div>
+            <div class="card-body p-4 text-center">
+                <p class="fs-5 mb-4">Are you sure you want to delete the employee record for:</p>
+                <h3 class="fw-bold text-dark mb-1">{{ employee.name }}</h3>
+                <p class="text-muted mb-4">Role: {{ employee.role }} | Phone: {{ employee.phone }}</p>
+                
+                <div class="alert alert-warning text-start border-warning" role="alert">
+                    <i class="bi bi-info-circle-fill me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. All data associated with this employee will be permanently removed from the system.
+                </div>
+
+                <form action="{% url 'delete_employee' employee.id %}" method="post" class="mt-4">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-center gap-3">
+                        <a href="{% url 'employee_list' %}" class="btn btn-outline-secondary px-4 py-2 fw-medium">
+                            <i class="bi bi-x-circle me-1"></i> Cancel
+                        </a>
+                        <button type="submit" class="btn btn-danger px-4 py-2 fw-medium shadow-sm">
+                            <i class="bi bi-trash me-1"></i> Confirm Delete
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

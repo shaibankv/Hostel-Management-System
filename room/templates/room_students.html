@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Room Students - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <a href="{% url 'room_list' %}" class="text-decoration-none text-muted mb-2 d-inline-block">
+            <i class="bi bi-arrow-left"></i> Back to Rooms List
+        </a>
+        <h2 class="fw-bold text-dark mb-0">Students in Room {{ room.room_no }} (Block {{ room.block }})</h2>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Registration No.</th>
+                        <th>Name</th>
+                        <th>Course & Year</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for student in students %}
+                    <tr>
+                        <td class="ps-4 fw-medium">{{ student.reg_number }}</td>
+                        <td>{{ student.name }}</td>
+                        <td>{{ student.course }} - Year {{ student.year }}</td>
+                        <td>{{ student.phone }}</td>
+                        <td>{{ student.email }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted py-4">No students are currently assigned to this room.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

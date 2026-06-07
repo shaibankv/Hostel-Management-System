@@ -1,0 +1,77 @@
+{% extends 'base.html' %}
+
+{% block title %}Create System User - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-8 col-lg-6">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-dark mb-0">Create System User</h2>
+            <a href="{% url 'manage_users' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancel
+            </a>
+        </div>
+
+        {% if error %}
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm border-0" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i><strong>Error!</strong> {{ error }}
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <form action="{% url 'add_user' %}" method="post">
+                    {% csrf_token %}
+                    
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Account Credentials</h5>
+                    
+                    <div class="mb-4">
+                        <label for="username" class="form-label fw-medium">Username <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person text-muted"></i></span>
+                            <input type="text" class="form-control" id="username" name="username" required placeholder="Enter a unique username">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="email" class="form-label fw-medium">Email Address <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope text-muted"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" required placeholder="user@example.com">
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="password" class="form-label fw-medium">Password <span class="text-danger">*</span></label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock text-muted"></i></span>
+                            <input type="password" class="form-control" id="password" name="password" required placeholder="Create a strong password">
+                        </div>
+                    </div>
+
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2 mt-5">Access Permissions</h5>
+
+                    <div class="mb-4">
+                        <label for="role" class="form-label fw-medium">System Role <span class="text-danger">*</span></label>
+                        <select class="form-select" id="role" name="role" required>
+                            <option value="" selected disabled>Select the user's role...</option>
+                            <option value="Student">Student (Can view own dashboard & profile)</option>
+                            <option value="Staff">Staff (Can view staff dashboard)</option>
+                            <option value="Warden">Warden (Can manage hostel block & complaints)</option>
+                            <option value="Admin">Admin (Full System Access)</option>
+                        </select>
+                        <div class="form-text mt-2">The selected role determines what the user can see and do within the dashboard. After creating a user account, you can link it to a Student or Employee profile.</div>
+                    </div>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-person-plus me-2"></i> Create User Account
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

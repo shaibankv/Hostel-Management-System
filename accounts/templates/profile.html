@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+
+{% block title %}My Profile | SEA HSM{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card border-0 shadow-sm rounded-4 overflow-hidden mt-4">
+            <div class="card-header bg-primary text-white p-4 text-center" style="background: linear-gradient(135deg, #0d6efd 0%, #0a58ca 100%);">
+                <div class="mb-3">
+                    <div class="bg-white text-primary rounded-circle d-inline-flex align-items-center justify-content-center shadow-sm" style="width: 80px; height: 80px; font-size: 2.5rem;">
+                        <i class="bi bi-person-fill"></i>
+                    </div>
+                </div>
+                <h4 class="mb-0 fw-bold">{{ user.employee.name|title }}</h4>
+                <p class="mb-0 text-white-50 mt-1">{{ user.role }}</p>
+            </div>
+            
+            <div class="card-body p-4">
+                <h5 class="card-title fw-bold mb-4 border-bottom pb-2">Profile Details</h5>
+                
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-person-badge me-2"></i>Username</div>
+                    <div class="col-sm-8 fw-semibold">{{ user.username }}</div>
+                </div>
+                
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-shield-lock me-2"></i>Role</div>
+                    <div class="col-sm-8 fw-semibold">
+                        <span class="badge bg-info text-dark px-3 py-2 rounded-pill">{{ user.role }}</span>
+                    </div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-envelope me-2"></i>Email</div>
+                    <div class="col-sm-8 fw-semibold">{{ user.employee.email|default:"Not Provided" }}</div>
+                </div>
+
+                {% if employee %}
+                <h5 class="card-title fw-bold mt-4 mb-4 border-bottom pb-2">Employee Information</h5>
+
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-person-lines-fill me-2"></i>Full Name</div>
+                    <div class="col-sm-8 fw-semibold">{{ employee.name }}</div>
+                </div>
+
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-telephone me-2"></i>Phone</div>
+                    <div class="col-sm-8 fw-semibold">{{ employee.phone }}</div>
+                </div>
+                
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-clock-history me-2"></i>Shift</div>
+                    <div class="col-sm-8 fw-semibold">{{ employee.shift }}</div>
+                </div>
+                
+                <div class="row mb-3 align-items-center">
+                    <div class="col-sm-4 text-muted"><i class="bi bi-cash-stack me-2"></i>Salary</div>
+                    <div class="col-sm-8 fw-semibold">₹{{ employee.salary }}</div>
+                </div>
+                {% endif %}
+
+                <div class="mt-5 pt-3 text-center">
+                    <a href="{% url 'dashboard' %}" class="btn btn-outline-primary px-4 py-2 rounded-pill shadow-sm hover-lift">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-lift {
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .hover-lift:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 .5rem 1rem rgba(0,0,0,.15)!important;
+    }
+</style>
+{% endblock %}

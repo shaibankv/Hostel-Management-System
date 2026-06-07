@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}Complaints Log - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark mb-0">Complaints Register</h2>
+    {% if request.user.role == 'Student' %}
+    <a href="{% url 'add_complaint' %}" class="btn btn-primary shadow-sm">
+        <i class="bi bi-plus-circle me-1"></i> Register Complaint
+    </a>
+    {% endif %}
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Date</th>
+                        <th>Student Name</th>
+                        <th>Room</th>
+                        <th>Complaint Subject</th>
+                        <th>Status</th>
+                        {% if request.user.role == 'Admin' or request.user.role == 'Warden' or request.user.role == 'Staff' %}
+                        <th class="pe-4 text-end">Actions</th>
+                        {% endif %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td class="ps-4">{{ complaint.date|date:"M d, Y" }}</td>
+                        <td class="fw-medium">{{ complaint.name }}</td>
+                        <td>{{ complaint.block }}-{{ complaint.room_no }}</td>
+                        <td>{{ complaint.complaint }}</td>
+                        <td>
+                            {% if complaint.status == 'Pending' %}
+                            <span class="badge bg-warning text-dark rounded-pill">{{ complaint.status }}</span>
+                            {% elif complaint.status == 'In Progress' %}
+                            <span class="badge bg-primary text-white rounded-pill">{{ complaint.status }}</span>
+                            {% else %}
+                            <span class="badge bg-success text-white rounded-pill">{{ complaint.status }}</span>
+                            {% endif %}
+                        </td>
+                        {% if request.user.role == 'Admin' or request.user.role == 'Warden' or request.user.role == 'Staff' %}
+                        <td class="pe-4 text-end">
+                            {% if complaint.status == 'Pending' %}
+                            <form action="{% url 'in_progress_complaint' complaint.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-primary me-1" title="Mark In Progress"><i class="bi bi-hourglass-split"></i></button>
+                            </form>
+                            <form action="{% url 'solve_complaint' complaint.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Solved"><i class="bi bi-check-circle"></i></button>
+                            </form>
+                            {% elif complaint.status == 'In Progress' %}
+                            <form action="{% url 'solve_complaint' complaint.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-sm btn-outline-success" title="Mark Solved"><i class="bi bi-check-circle"></i></button>
+                            </form>
+                            {% else %}
+                            <span class="text-muted"><i class="bi bi-check2-all"></i> Closed</span>
+                            {% endif %}
+                        </td>
+                        {% endif %}
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" class="text-center text-muted py-4">No complaints filed yet.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

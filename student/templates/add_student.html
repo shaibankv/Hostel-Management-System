@@ -1,0 +1,234 @@
+{% extends 'base.html' %}
+
+{% block title %}Add Student - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="fw-bold text-dark mb-0">Add New Student</h2>
+            <a href="{% url 'student_list' %}" class="btn btn-outline-secondary">
+                <i class="bi bi-x-circle me-1"></i> Cancel
+            </a>
+        </div>
+
+        {% if error %}
+        <!-- Error Dialogue Box Modal -->
+        <div class="modal fade" id="errorModal" tabindex="-1" aria-labelledby="errorModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content border-danger shadow">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="errorModalLabel"><i
+                                class="bi bi-exclamation-triangle-fill me-2"></i> Error</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"
+                            aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body text-center py-4">
+                        <i class="bi bi-x-circle text-danger mb-3" style="font-size: 3rem;"></i>
+                        <h5 class="mb-3">Student Not Added</h5>
+                        <p class="mb-0">{{ error }}</p>
+                    </div>
+                    <div class="modal-footer justify-content-center">
+                        <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card border-0 shadow-sm rounded-3">
+            <div class="card-body p-4 p-md-5">
+                <form action="{% url 'add_student' %}" method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <!-- Account & Personal Info -->
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2">Account & Personal Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <label for="user" class="form-label fw-medium mb-0">Link User Account <span
+                                        class="text-danger">*</span></label>
+                                <a href="{% url 'add_user' %}" class="btn btn-sm btn-outline-primary shadow-sm"
+                                    style="padding: 0.1rem 0.5rem; font-size: 0.8rem;">
+                                    <i class="bi bi-person-plus"></i> Create User
+                                </a>
+                            </div>
+                            <select class="form-select" id="user" name="user" required>
+                                <option value="" selected disabled>Select a User Account...</option>
+                                {% for u in users %}
+                                <option value="{{ u.id }}">{{ u.username }} ({{ u.email }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="name" class="form-label fw-medium">Full Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="name" name="name" required
+                                placeholder="e.g., John Doe">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="dob" class="form-label fw-medium">Date of Birth <span
+                                    class="text-danger">*</span></label>
+                            <input type="date" class="form-control" id="dob" name="dob" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="reg_number" class="form-label fw-medium">Registration Number <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="reg_number" name="reg_number" required
+                                placeholder="e.g., REG123456">
+                        </div>
+                    </div>
+
+                    <!-- Academic & Contact -->
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2 mt-5">Academic & Contact Details</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="course" class="form-label fw-medium">Course <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="course" name="course" required
+                                placeholder="e.g., B.Tech Computer Science">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="year" class="form-label fw-medium">Year of Study <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="year" name="year" required
+                                placeholder="e.g., 1, 2, 3...">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="phone" class="form-label fw-medium">Phone Number <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="phone" name="phone" required
+                                placeholder="+91 1234567890">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label fw-medium">Email Address <span
+                                    class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="email" name="email" required
+                                placeholder="john@example.com">
+                        </div>
+                        <div class="col-12">
+                            <label for="home_address" class="form-label fw-medium">Home Address <span
+                                    class="text-danger">*</span></label>
+                            <textarea class="form-control" id="home_address" name="home_address" rows="3" required
+                                placeholder="Full residential address..."></textarea>
+                        </div>
+                    </div>
+
+                    <!-- Hostel Assignment -->
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2 mt-5">Hostel Assignment</h5>
+                    <div class="row g-3 mb-4">
+                        {% regroup rooms|dictsort:"block" by block as block_list %}
+                        <div class="col-md-6">
+                            <label for="block" class="form-label fw-medium">Select Block <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="block" required>
+                                <option value="" selected disabled>Select a block...</option>
+                                {% for block in block_list %}
+                                <option value="{{ block.grouper }}">Block {{ block.grouper }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="room" class="form-label fw-medium">Select Room <span
+                                    class="text-danger">*</span></label>
+                            <select class="form-select" id="room" name="room" required disabled>
+                                <option value="" selected disabled>First select a block...</option>
+                                {% for r in rooms %}
+                                <option value="{{ r.id }}" data-block="{{ r.block }}" style="display:none;">Room {{r.room_no }} (Available: {{ r.available_space }})</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-12 mt-3">
+                            <label for="hostel_fee" class="form-label fw-medium">Hostel Fee <span
+                                    class="text-danger">*</span></label>
+                            <input type="number" class="form-control" id="hostel_fee" name="hostel_fee" step="500"
+                                placeholder="e.g., 10000">
+                        </div>
+                    </div>
+
+                    <!-- Guardian Details -->
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2 mt-5">Guardian Information</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label for="guardian_name" class="form-label fw-medium">Guardian Name <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="guardian_name" name="guardian_name" required
+                                placeholder="Guardian's full name">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="guardian_phone" class="form-label fw-medium">Guardian Phone <span
+                                    class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="guardian_phone" name="guardian_phone" required
+                                placeholder="Guardian's phone number">
+                        </div>
+                        <div class="col-md-4">
+                            <label for="guardian_email" class="form-label fw-medium">Guardian Email <span
+                                    class="text-danger">*</span></label>
+                            <input type="email" class="form-control" id="guardian_email" name="guardian_email" required
+                                placeholder="Guardian's email">
+                        </div>
+                    </div>
+
+                    <!-- Document Uploads -->
+                    <h5 class="fw-bold mb-4 text-primary border-bottom pb-2 mt-5">Document Uploads</h5>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-6">
+                            <label for="photo" class="form-label fw-medium">Profile Photo</label>
+                            <input class="form-control" type="file" id="photo" name="photo" accept="image/*">
+                            <div class="form-text">Upload a recent passport size photograph (JPG/PNG).</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="id_proof" class="form-label fw-medium">ID Proof</label>
+                            <input class="form-control" type="file" id="id_proof" name="id_proof" accept=".pdf,image/*">
+                            <div class="form-text">Upload a valid government/college ID proof (PDF/JPG/PNG).</div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid mt-5">
+                        <button type="submit" class="btn btn-primary btn-lg shadow-sm">
+                            <i class="bi bi-save me-2"></i> Save Student Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const blockSelect = document.getElementById('block');
+        const roomSelect = document.getElementById('room');
+        const roomOptions = roomSelect.querySelectorAll('option[data-block]');
+
+        blockSelect.addEventListener('change', function () {
+            const selectedBlock = this.value;
+
+            // Enable the room select box
+            roomSelect.disabled = false;
+
+            // Reset the selected value
+            roomSelect.value = "";
+            roomSelect.options[0].text = "Select a room...";
+
+            // Hide/Show options based on block
+            roomOptions.forEach(function (opt) {
+                if (opt.getAttribute('data-block') === selectedBlock) {
+                    opt.style.display = '';
+                } else {
+                    opt.style.display = 'none';
+                }
+            });
+        });
+
+        // Automatically show the error dialogue box if it exists
+        const errorModalElement = document.getElementById('errorModal');
+        if (errorModalElement) {
+            const errorModal = new bootstrap.Modal(errorModalElement);
+            errorModal.show();
+        }
+    });
+</script>
+{% endblock %}

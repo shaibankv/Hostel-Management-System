@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}My Room - SEA HSM{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="fw-bold text-dark mb-0">My Room Details</h2>
+</div>
+
+{% if room %}
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 shadow-sm rounded-3 h-100 bg-primary text-white">
+            <div class="card-body p-4 text-center">
+                <i class="bi bi-door-open-fill mb-3 d-block" style="font-size: 3rem;"></i>
+                <h3 class="fw-bold mb-1">Room {{ room.room_no }}</h3>
+                <p class="mb-0 fs-5">Block {{ room.block }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm rounded-3 h-100">
+            <div class="card-body p-4">
+                <h5 class="fw-bold text-dark mb-3 border-bottom pb-2">Room Information</h5>
+                <div class="row g-3">
+                    <div class="col-sm-6">
+                        <p class="text-muted mb-1 small">Capacity</p>
+                        <p class="fw-medium text-dark mb-0">{{ room.capacity }} Students</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="text-muted mb-1 small">Current Occupancy</p>
+                        <p class="fw-medium text-dark mb-0">{{ room.student_set.count }} Students</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <p class="text-muted mb-1 small">Hostel Fee</p>
+                        <p class="fw-medium text-dark mb-0">₹{{ student.hostel_fee }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card border-0 shadow-sm rounded-3">
+    <div class="card-body p-0">
+        <div class="p-4 border-bottom">
+            <h5 class="fw-bold text-dark mb-0">My Roommates</h5>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th class="ps-4">Name</th>
+                        <th>Course</th>
+                        <th>Phone</th>
+                        <th>Email</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for roommate in roommates %}
+                    <tr>
+                        <td class="ps-4 fw-medium">{{ roommate.name }}</td>
+                        <td>{{ roommate.course }}</td>
+                        <td>{{ roommate.phone }}</td>
+                        <td><a href="mailto:{{ roommate.email }}" class="text-decoration-none">{{ roommate.email }}</a></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4" class="text-center text-muted py-4">You currently have no roommates.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-warning shadow-sm border-0 d-flex align-items-center" role="alert">
+    <i class="bi bi-exclamation-triangle-fill fs-4 me-3"></i>
+    <div>
+        <h5 class="alert-heading fw-bold mb-1">No Room Assigned</h5>
+        <p class="mb-0">You have not been assigned to a room yet. Please contact the warden or admin for assistance.</p>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
